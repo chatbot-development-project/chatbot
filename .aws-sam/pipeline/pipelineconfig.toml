@@ -1,0 +1,16 @@
+version = 0.1
+[default.pipeline_bootstrap.parameters]
+oidc_provider_url = "https://token.actions.githubusercontent.com"
+oidc_client_id = "sts.amazonaws.com"
+github_org = " chatbot-development-project"
+github_repo = "chatbot"
+deployment_branch = "main"
+oidc_provider = "github-actions"
+permissions_provider = "OpenID Connect (OIDC)"
+
+[prod.pipeline_bootstrap.parameters]
+pipeline_execution_role = "arn:aws:iam::970503882765:role/aws-sam-cli-managed-prod-pipe-PipelineExecutionRole-qElwJbHzNmO3"
+cloudformation_execution_role = "arn:aws:iam::970503882765:role/aws-sam-cli-managed-prod--CloudFormationExecutionRo-qD8MG1Z1Gi18"
+artifacts_bucket = "aws-sam-cli-managed-prod-pipeline--artifactsbucket-yaed62f2yabk"
+image_repository = ""
+region = "us-east-1"
