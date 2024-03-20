@@ -5,6 +5,7 @@ Description: Creates a Lambda function that writes to an S3 bucket
 Parameters:
   DestinationBucketName:
     Type: String
+    Default: "chatbot-bucket"
     
 Resources:
   ## S3 bucket
