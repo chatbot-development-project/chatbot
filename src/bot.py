@@ -5,6 +5,6 @@ def lambda_handler(event, context):
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "message": "crawl test",
+            "message": "running crawl test",
         }),
     }

@@ -30,7 +30,7 @@ Outputs:
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   CrawlerApi:
     Description: "API Gateway endpoint URL for Prod stage for CrawlerFunction"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/crawl/"
   CrawlerFunction:
     Description: "CrawlerFunction ARN"
     Value: !GetAtt CrawlerFunction.Arn
