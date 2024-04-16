@@ -20,7 +20,7 @@ The architecture of the project consists of several components:
 - **DynamoDB**: Stores chat history, user data, and other relevant information.
 - **AWS Bedrock**: Powers the AI functionality, providing natural language processing capabilities for generating intelligent responses.
 
-![Architecture Diagram](architecture_diagram.png)
+<img src="Architectural_Diagram.drawio.png" alt="Architecture Diagram" width="600">
 
 ## Technologies Used
 
