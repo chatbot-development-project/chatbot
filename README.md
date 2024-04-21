@@ -35,7 +35,7 @@ The architecture of the project consists of several components:
 To set up the project locally, follow these steps:
 
 1. Clone the repository from GitHub.
-2. Install dependencies using `npm install`.
+2. Install dependencies using `pip3 install`.
 3. Configure environment variables for AWS services.
 4. Deploy Lambda functions and API Gateway endpoints using AWS CLI or Serverless Framework.
 5. Set up WhatsApp API integration and configure webhook URL to point to the API Gateway endpoint.
