@@ -9,6 +9,8 @@ module "api_gateway" {
   post_invoke_arn = module.lambda_functions.whatsapp_input_invoke_arn
   whatsapp_input_function_name = module.lambda_functions.whatsapp_input_function_name
   cloud_auth_function_name = module.lambda_functions.cloud_auth_function_name
+  # api empty variable = module/lambda_function/<the output name of the lambda output.tf>
+  # create an empty var in api gateway variable.tf, ref the var in the api gateway main.tf, then ref the output of the lambda module output.tf to the api gateway var.tf on runtime
 }
 
 module "dynamodb" {

@@ -1,5 +1,6 @@
-resource "aws_dynamodb_table" "basic-dynamodb-table" {
-  name           = "user_metadata"
+# create dynamodb table and enable process stream
+resource "aws_dynamodb_table" "dynamodb-table" {
+  name           = var.dynamodb_table_name
   billing_mode   = "PROVISIONED"
   read_capacity  = 1
   write_capacity = 1
@@ -18,11 +19,6 @@ resource "aws_dynamodb_table" "basic-dynamodb-table" {
     type = "S"
   }
 
-  ttl {
-    attribute_name = "TimeToExist"
-    enabled        = false
-  }
-
   global_secondary_index {
     name               = "UserTitleIndex"
     hash_key           = "message_id"
@@ -37,4 +33,13 @@ resource "aws_dynamodb_table" "basic-dynamodb-table" {
     Name        = "dynamodb-table"
     Environment = "Prod"
   }
+}
+
+# enable event source mapping to allow dynamodb stream trigger process stream function
+resource "aws_lambda_event_source_mapping" "trg" {
+  event_source_arn = aws_dynamodb_table.dynamodb-table.stream_arn
+  #function_name = aws_lambda_function.process_stream.arn
+  function_name = var.process_stream_function_name
+  starting_position = "LATEST"
+  batch_size        = 1000
 }
