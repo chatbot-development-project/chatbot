@@ -1,11 +1,6 @@
 name: Pipeline
 
 on:
-  workflow_dispatch:
-    inputs:
-      run_apply:
-        type: boolean
-        description: 'run terraform apply'
   push:
     branches:
       - 'feature**'
