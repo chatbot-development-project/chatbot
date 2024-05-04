@@ -1,11 +1,14 @@
 name: Pipeline
 
 on:
-  workflow_dispatch:
-    inputs:
-      run_apply:
-        type: boolean
-        description: 'run terraform apply'
+  # workflow_dispatch:
+  #   inputs:
+  #     run_apply:
+  #       type: boolean
+  #       description: 'run terraform apply'
+  pull_request:
+    types:
+      - closed
   push:
     branches:
       - 'feature**'
@@ -16,6 +19,9 @@ env:
   AWS_REGION: 'us-east-1'
 
 jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+
   terraform:
     name: 'Run Terraform'
     runs-on: ubuntu-latest

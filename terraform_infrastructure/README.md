@@ -1,5 +1,6 @@
 <!-- BEGIN_TF_DOCS -->
 
+## File Structure
 ```
 └── terraform_infrastructure/
     ├── main.tf
