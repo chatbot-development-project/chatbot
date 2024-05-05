@@ -6,6 +6,10 @@ on:
       run_apply:
         type: boolean
         description: 'run terraform apply'
+  push:
+    branches:
+      - 'feature**'
+
 
 env:
   AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
