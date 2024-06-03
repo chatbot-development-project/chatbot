@@ -48,7 +48,7 @@ def create_message(request_id, date_time, whatsapp_number, whatsapp_message):
         'Item': {
             'message_id': {'S': request_id},
             'timestamp': {'S': str(date_time)},
-            'whatsapp_number': {'N': whatsapp_number},
+            'whatsapp_number': {'S': whatsapp_number},
             'whatsapp_message': {'S': whatsapp_message}
         }
     }
