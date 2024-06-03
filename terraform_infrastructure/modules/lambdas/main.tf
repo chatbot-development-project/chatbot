@@ -1,3 +1,7 @@
+#############################
+## WHATSAPP INPUT  #########
+#############################
+
 # assume role for whatsapp input
 resource "aws_iam_role" "input_assume" {
   name = var.whatsapp_input_role
@@ -36,6 +40,11 @@ resource "aws_cloudwatch_log_group" "input_lambda_logging" {
   name = "/aws/lambda/${aws_lambda_function.whatsapp_input.function_name}"
   retention_in_days = null   # mean never expire
 }
+
+
+#############################
+## WHATSAPP OUTPUT  #########
+#############################
 
 # assume role for whatsapp output
 resource "aws_iam_role" "output_assume" {
@@ -85,6 +94,12 @@ resource "aws_cloudwatch_log_group" "output_lambda_logging" {
 }
 #./CODE/whatsapp_input/whatsapp_input.py
 
+
+
+#############################
+## CLOUD AUTH       #########
+#############################
+
 # assume role for cloudapi auth
 resource "aws_iam_role" "cloud_auth_assume" {
   name = var.cloud_auth_role
@@ -124,6 +139,11 @@ resource "aws_cloudwatch_log_group" "cloud_auth_lambda_logging" {
   retention_in_days = null
 }
 
+
+#############################
+## PROCESS STREAM   #########
+#############################
+
 # assume role for process stream
 resource "aws_iam_role" "process_assume" {
   name = var.process_stream_role
@@ -146,11 +166,26 @@ data "archive_file" "process_stream_python_code" {
   output_path = "${path.module}/process_stream.zip"
 }
 
+# boto3 layer for process stream
+resource "aws_lambda_layer_version" "Boto3_Layer" {
+  filename   = "${path.module}/Boto3_Layer.zip"
+  layer_name = "Boto3_Layer"
+  # compatible_runtimes = ["python3.8"]
+}
+
+# langchain layer for process stream
+resource "aws_lambda_layer_version" "langchain_layer" {
+  filename   = "${path.module}/langchain_layer.zip"
+  layer_name = "langchain_layer"
+  # compatible_runtimes = ["python3.8"]
+}
+
 # process stream lambda function
 resource "aws_lambda_function" "process_stream" {
   function_name =var.process_stream
   role = aws_iam_role.process_assume.arn
   handler = "process_stream.lambda_handler"
+  layers  = [aws_lambda_layer_version.Boto3_Layer.arn, aws_lambda_layer_version.langchain_layer.arn]
   runtime = var.Lruntime
   timeout = var.Ltimeout
   filename = data.archive_file.process_stream_python_code.output_path 
