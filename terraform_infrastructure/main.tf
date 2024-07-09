@@ -17,3 +17,6 @@ module "dynamodb" {
   process_stream_function_name = module.lambda_functions.process_stream_lambda_arn
 }
 
+module "bedrock" {
+  source = "./modules/bedrock"
+}
