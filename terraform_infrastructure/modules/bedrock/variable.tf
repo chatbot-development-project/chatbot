@@ -7,7 +7,7 @@ variable "bucket_name" {
 variable "secret_name" {
   description = "The name of the Secrets Manager secret"
   type        = string
-  default     = "pinecone_secret_api_key"
+  default     = "pinecon_secret_api_key"  ## chnage name cause of aws issue
 }
 
 variable "index_management_page_url" {
