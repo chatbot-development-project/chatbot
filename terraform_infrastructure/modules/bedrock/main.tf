@@ -183,3 +183,5 @@ resource "aws_iam_role_policy_attachment" "bedrock_policy_attachment" {
 
 
 # "arn:aws:secretsmanager:us-east-1:${data.aws_caller_identity.current.account_id}:secret/${var.secret_name}*"
+
+# bedrock knowledeg base resource would depend on the policy and excecution role
