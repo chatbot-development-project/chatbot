@@ -1,5 +1,7 @@
 module "lambda_functions" {
   source = "./modules/lambdas"
+
+  knowledege_base_evn = module.bedrock.knowledge_base_id
 }
 
 module "api_gateway" {

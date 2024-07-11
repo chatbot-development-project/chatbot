@@ -1,6 +1,7 @@
 import json
 import boto3
 import time
+import os
 from boto3.dynamodb.conditions import Key
 from langchain.memory import ConversationBufferMemory
 from langchain_community.chat_models import BedrockChat
@@ -31,7 +32,8 @@ bedrock_model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
 llm = BedrockChat(model_id=bedrock_model_id, model_kwargs=bedrock_model_parameter, client=bedrock_client)
 
 # configure knowledge_base
-knowledge_base_id = "GT9HVDTIGQ"
+knowledge_base_id = os.getenv('KNOWLEDGE_BASE_ID')
+# knowledge_base_id = "GT9HVDTIGQ"
 retriever = AmazonKnowledgeBasesRetriever(
         knowledge_base_id=knowledge_base_id,
         retrieval_config={
