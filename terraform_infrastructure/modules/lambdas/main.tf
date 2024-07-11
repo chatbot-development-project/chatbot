@@ -183,6 +183,12 @@ resource "aws_lambda_function" "process_stream" {
   timeout = var.Ltimeout
   filename = data.archive_file.process_stream_python_code.output_path 
   source_code_hash = filebase64sha256(data.archive_file.process_stream_python_code.output_path)
+
+  environment {
+    variables = {
+      KNOWLEDGE_BASE_ID = var.knowledege_base_evn
+    }
+  }
 }
 
 # cloud watch logging for process stream lambda function
