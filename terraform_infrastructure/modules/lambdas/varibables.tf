@@ -50,3 +50,7 @@ variable "Lruntime" {
 variable "Ltimeout" {
   default = "900"
 }
+
+variable "knowledege_base_evn" {
+  description = "this is the evn of the knowledge base id that would be passed to the handler"
+}

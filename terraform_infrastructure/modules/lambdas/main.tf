@@ -166,13 +166,6 @@ data "archive_file" "process_stream_python_code" {
   output_path = "${path.module}/process_stream.zip"
 }
 
-# boto3 layer for process stream
-resource "aws_lambda_layer_version" "Boto3_Layer" {
-  filename   = "${path.module}/Boto3_Layer.zip"
-  layer_name = "Boto3_Layer"
-  # compatible_runtimes = ["python3.8"]
-}
-
 # langchain layer for process stream
 resource "aws_lambda_layer_version" "langchain_layer" {
   filename   = "${path.module}/langchain_layer.zip"
@@ -185,11 +178,17 @@ resource "aws_lambda_function" "process_stream" {
   function_name =var.process_stream
   role = aws_iam_role.process_assume.arn
   handler = "process_stream.lambda_handler"
-  layers  = [aws_lambda_layer_version.Boto3_Layer.arn, aws_lambda_layer_version.langchain_layer.arn]
+  layers  = [aws_lambda_layer_version.langchain_layer.arn]
   runtime = var.Lruntime
   timeout = var.Ltimeout
   filename = data.archive_file.process_stream_python_code.output_path 
   source_code_hash = filebase64sha256(data.archive_file.process_stream_python_code.output_path)
+
+  environment {
+    variables = {
+      KNOWLEDGE_BASE_ID = var.knowledege_base_evn
+    }
+  }
 }
 
 # cloud watch logging for process stream lambda function

@@ -12,7 +12,9 @@
             "Effect": "Allow",
             "Action": [
                 "bedrock:InvokeModel",
-                "bedrock:InvokeModelWithResponseStream"
+                "bedrock:InvokeModelWithResponseStream",
+                "bedrock:Retrieve",
+                "bedrock:*"
             ],
             "Resource": "*"
         },
@@ -37,3 +39,4 @@
         }
     ]
 }
+

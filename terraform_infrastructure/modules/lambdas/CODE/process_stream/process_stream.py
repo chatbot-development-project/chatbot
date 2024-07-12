@@ -1,32 +1,47 @@
 import json
 import boto3
 import time
-from datetime import datetime
+import os
 from boto3.dynamodb.conditions import Key
-from langchain.llms.bedrock import Bedrock
-from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferMemory
+from langchain_community.chat_models import BedrockChat
 from langchain_community.chat_message_histories import DynamoDBChatMessageHistory
+from langchain.retrievers import AmazonKnowledgeBasesRetriever
+from langchain.chains import ConversationalRetrievalChain
 
 ###################
 #### variables ####
 ###################
 
+lambda_client = boto3.client('lambda')
+
+# configure dynamodb table resource
 ddb = boto3.resource('dynamodb')
 user_metadata = ddb.Table('user_metadata')
 user_session_record = ddb.Table('user_session_record')
 session_table = ddb.Table('session_table')
 
-lambda_client = boto3.client('lambda')
-
+# configure bedrock agent
 bedrock_client = boto3.client(
         service_name='bedrock-runtime',
         region_name='us-east-1'
     )
-bedrock_model_id = "cohere.command-text-v14"
-bedrock_model_parameter = {"temperature": 0.9, "p": 1, "k": 0}
+#bedrock_model_id = "cohere.command-text-v14"
+bedrock_model_parameter = {"temperature": 0.9}
+bedrock_model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
+llm = BedrockChat(model_id=bedrock_model_id, model_kwargs=bedrock_model_parameter, client=bedrock_client)
 
-llm = Bedrock(model_id=bedrock_model_id, model_kwargs=bedrock_model_parameter, client=bedrock_client)
+# configure knowledge_base
+knowledge_base_id = os.getenv('KNOWLEDGE_BASE_ID')
+# knowledge_base_id = "GT9HVDTIGQ"
+retriever = AmazonKnowledgeBasesRetriever(
+        knowledge_base_id=knowledge_base_id,
+        retrieval_config={
+            "vectorSearchConfiguration": {
+                "numberOfResults": 4
+            }
+        }
+    )
 
 ##################
 #### Utilites ####
@@ -44,28 +59,25 @@ def dynamodb_memory(item):
         chat_memory=message_history, 
         return_messages=True,
         ai_prefix="A",
-        human_prefix="H"
+        human_prefix="H",
+        input_key="question",
+        output_key="answer",
     )
     return memory
-    
-def agent_text(llm, prompt, memory):
-    conversation_with_memory = ConversationChain( 
-        llm = llm, #using the Bedrock LLM
-        memory = memory, #with the dynamodb memory
-        verbose = True #print out some of the internal states of the chain while running
-    )
-    conversation_with_memory.prompt.template ="""The following is a friendly conversation between a human and an AI. 
-    The AI is talkative and provides lots of specific details from its context. 
-    If the AI does not know the answer to a question, it truthfully says it does not know.
-    Always reply in the original user language.
 
-    Current conversation:
-    {history}
-
-    Human:{input}
-
-    Assistant:"""
-    return conversation_with_memory.predict(input=prompt)
+def query_knowledge_base(llm, prompt, retriever, memory):
+    chain = ConversationalRetrievalChain.from_llm(
+            llm,
+            retriever=retriever,
+            chain_type="stuff",
+            memory=memory,
+            return_source_documents=False, # True, if you want to share the document where you referenced the information 
+            get_chat_history=lambda h : h,
+            verbose=True
+        )
+    chat_history = memory.chat_memory.messages
+    print('CHAT HISTORY REQUEST RECEIVED:', chat_history)
+    return chain.invoke({"question": prompt, "chat_history": chat_history})
 
 def query_items(table, key, keyValue):
     response = table.query(
@@ -92,6 +104,7 @@ def update_session(table, value, session_time):
         print (e)
     else:
         return session_response
+
 
 #########################
 #### lambda function ####
@@ -147,7 +160,9 @@ def lambda_handler(event, context):
         
         # get memory and run llm
         memory = dynamodb_memory(ss_id)
-        bedrock_response = agent_text(llm, whatsapp_message, memory)
+        knowledge_base = query_knowledge_base(llm, whatsapp_message, retriever, memory)     
+        knowledge_base_response = knowledge_base['answer']
+        print('RESPONSE', knowledge_base_response)
 
         # invoke the whatsapp output
         function_name = 'whatsapp_output'
@@ -158,16 +173,17 @@ def lambda_handler(event, context):
                 'message_id': message_id,
                 'whatsapp_number': whatsapp_number,
                 'whatsapp_message': whatsapp_message,
-                'body': bedrock_response
+                'body': knowledge_base_response
             })
         )
         
         # update session_table with record of conversation
         history = DynamoDBChatMessageHistory(table_name="session_table", session_id=ss_id)
         history.add_user_message(whatsapp_message)
-        history.add_ai_message(bedrock_response)
+        history.add_ai_message(knowledge_base_response)
+        print('ADD HISTORY TO TABLE')
 
-        return({"body":bedrock_response})
+        return({"body":knowledge_base_response})
         
     except Exception as e:
         print('FAILED!', e)
