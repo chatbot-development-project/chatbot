@@ -59,6 +59,8 @@ resource "awscc_bedrock_knowledge_base" "knowledge" {
       embedding_model_arn = "arn:aws:bedrock:us-east-1::foundation-model/cohere.embed-english-v3"
     }
   }
+
+  depends_on = [aws_iam_role.bedrock_execution_role, aws_iam_policy.bedrock_policy]
 }
 
 
