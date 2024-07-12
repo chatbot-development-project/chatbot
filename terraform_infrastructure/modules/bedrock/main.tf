@@ -11,9 +11,16 @@ resource "aws_s3_bucket" "chatbot_bucket" {
   }
 }
 
+# Random string resource
+resource "random_string" "rand" {
+  length  = 6
+  special = false
+}
+
 # create aws secret to store the pine cone api key that will be passed to the knowledege base as a ref to the pine cone db
 resource "aws_secretsmanager_secret" "secret" {
-  name        = var.secret_name
+  # name        = var.secret_name
+  name = "${var.secret_name}-${random_string.rand.result}"
   description = "Secret for chatbot development project bedrock knowledgebase"
 }
 
