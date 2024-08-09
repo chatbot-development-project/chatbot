@@ -17,7 +17,7 @@ resource "aws_api_gateway_resource" "cloudapi" {
 
 # create the Request validator for the get method
 resource "aws_api_gateway_request_validator" "request_validator" {
-  name                        = "requestvalidator"
+  name                        = "Validate query string parameters and headers"
   rest_api_id                 = aws_api_gateway_rest_api.grisapi.id
   validate_request_parameters = true
 }
