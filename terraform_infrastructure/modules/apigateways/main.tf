@@ -29,7 +29,7 @@ resource "aws_api_gateway_method" "get_method" {
 }
 
 # create the Request validator
-resource "aws_api_gateway_request_validator" "example" {
+resource "aws_api_gateway_request_validator" "request_validator" {
   name                        = "requestvalidator"
   rest_api_id                 = aws_api_gateway_rest_api.grisapi.id
   validate_request_parameters = true
