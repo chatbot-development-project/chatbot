@@ -15,6 +15,13 @@ resource "aws_api_gateway_resource" "cloudapi" {
   path_part   = var.resource_name
 }
 
+# create the Request validator for the get method
+resource "aws_api_gateway_request_validator" "request_validator" {
+  name                        = "requestvalidator"
+  rest_api_id                 = aws_api_gateway_rest_api.grisapi.id
+  validate_request_parameters = true
+}
+
 # create api get method
 resource "aws_api_gateway_method" "get_method" {
   rest_api_id   = "${aws_api_gateway_rest_api.grisapi.id}"
@@ -26,13 +33,8 @@ resource "aws_api_gateway_method" "get_method" {
     "method.request.querystring.hub.mode" = false
     "method.request.querystring.hub.verify_token" = false
   }
-}
 
-# create the Request validator
-resource "aws_api_gateway_request_validator" "request_validator" {
-  name                        = "requestvalidator"
-  rest_api_id                 = aws_api_gateway_rest_api.grisapi.id
-  validate_request_parameters = true
+  request_validator_id = aws_api_gateway_request_validator.request_validator.id
 }
 
 # create api post method
