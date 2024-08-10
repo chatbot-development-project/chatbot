@@ -56,6 +56,14 @@ resource "aws_api_gateway_integration" "get_lambda_integration" {
   uri                   = var.get_invoke_arn
 }
 
+# create the method responses for the get method
+resource "aws_api_gateway_method_response" "get_response_200" {
+  rest_api_id             = aws_api_gateway_rest_api.grisapi.id
+  resource_id             = aws_api_gateway_resource.cloudapi.id
+  http_method             = aws_api_gateway_method.get_method.http_method
+  status_code = "200"
+}
+
 # define the lambda integration for the post method
 resource "aws_api_gateway_integration" "post_lambda_integration" {
   rest_api_id             = aws_api_gateway_rest_api.grisapi.id
