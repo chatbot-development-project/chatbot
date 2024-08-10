@@ -27,8 +27,7 @@
                 "logs:PutLogEvents"
             ],
             "Resource": [
-                "arn:aws:logs:us-east-1:*:*",
-                "arn:aws:logs:us-east-1:*:log-group:/aws/lambda/process_stream:*"
+                "*"
             ]
         },
         {
