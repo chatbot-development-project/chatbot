@@ -30,3 +30,7 @@ variable "whatsapp_input_function_name" {
 variable "cloud_auth_function_name" {
  description = "cloud auth function name"
 }
+
+variable "region" {
+  default = "us-east-1"
+}
