@@ -105,20 +105,27 @@ resource "aws_lambda_permission" "apigw_cloudauth_lambda" {
 }
 
 # assume role for api gateway
-#resource "aws_iam_role" "api_gateway_assume" {
-#  name = "apigatewayrole"
-#  assume_role_policy = file("${path.module}/policy/api_gateway_role.json")  # edit to the iam folder where the assume role json file is
-#}
+resource "aws_iam_role" "api_gateway_assume" {
+  name = "apigatewayrole"
+  assume_role_policy = file("${path.module}/policy/api_gateway_role.json")  # edit to the iam folder where the assume role json file is
+}
 
 # iam policy for the api gateway
-#resource "aws_iam_role_policy" "api_gateway_policy" {
-#  name = "apigatewaypolicy"
-#  policy = file("${path.module}/policy/api_gateway_policy.json")
-#  role = aws_iam_role.api_gateway_assume.id
-#}
+resource "aws_iam_role_policy" "api_gateway_policy" {
+  name = "apigatewaypolicy"
+  policy = file("${path.module}/policy/api_gateway_policy.json")
+  role = aws_iam_role.api_gateway_assume.id
+}
 
 # cloud watch logging for api gateway
 resource "aws_cloudwatch_log_group" "api_gateway_logging" {
   name = "/aws/apigateway/${aws_api_gateway_rest_api.grisapi.id}"
   retention_in_days = null
+}
+
+resource "aws_api_gateway_authorizer" "gateway_authorizer" {
+  name                   = "apiauth"
+  rest_api_id            = aws_api_gateway_rest_api.grisapi.id
+  authorizer_uri         = var.get_invoke_arn # (aws_lambda_function.cloud_auth.invoke_arn) # This sets the URI of the Lambda function that will be used as the authorizer (cloud auth)
+  authorizer_credentials = aws_iam_role.api_gateway_assume.arn # This specifies the IAM role ARN that API Gateway will assume to invoke the Lambda function.
 }
