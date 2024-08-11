@@ -101,21 +101,22 @@ resource "aws_lambda_permission" "apigw_cloudauth_lambda" {
   function_name = var.cloud_auth_function_name
   principal = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_api_gateway_rest_api.grisapi.execution_arn}/*/GET/${var.resource_name}"    #use variable to subsitute for the cloudapi(resource)
+  #source_arn = "${aws_api_gateway_rest_api.grisapi.execution_arn}/*/GET/${var.resource_name}"    #use variable to subsitute for the cloudapi(resource)
+  source_arn = "*"
 }
 
 # assume role for api gateway
-resource "aws_iam_role" "api_gateway_assume" {
-  name = "apigatewayrole"
-  assume_role_policy = file("${path.module}/policy/api_gateway_role.json")  # edit to the iam folder where the assume role json file is
-}
+#resource "aws_iam_role" "api_gateway_assume" {
+#  name = "apigatewayrole"
+#  assume_role_policy = file("${path.module}/policy/api_gateway_role.json")  # edit to the iam folder where the assume role json file is
+#}
 
 # iam policy for the api gateway
-resource "aws_iam_role_policy" "api_gateway_policy" {
-  name = "apigatewaypolicy"
-  policy = file("${path.module}/policy/api_gateway_policy.json")
-  role = aws_iam_role.api_gateway_assume.id
-}
+#resource "aws_iam_role_policy" "api_gateway_policy" {
+#  name = "apigatewaypolicy"
+#  policy = file("${path.module}/policy/api_gateway_policy.json")
+#  role = aws_iam_role.api_gateway_assume.id
+#}
 
 # cloud watch logging for api gateway
 resource "aws_cloudwatch_log_group" "api_gateway_logging" {
