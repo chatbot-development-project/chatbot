@@ -102,7 +102,7 @@ resource "aws_lambda_permission" "apigw_cloudauth_lambda" {
   principal = "apigateway.amazonaws.com"
 
   #source_arn = "${aws_api_gateway_rest_api.grisapi.execution_arn}/*/GET/${var.resource_name}"    #use variable to subsitute for the cloudapi(resource)
-  source_arn = "arn:aws:execute-api:*:*:${aws_api_gateway_rest_api.grisapi.id}/*/*/*"
+  source_arn = "arn:aws:execute-api:${var.region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.grisapi.id}/*/*/*"
 }
 
 # assume role for api gateway
@@ -123,3 +123,6 @@ resource "aws_cloudwatch_log_group" "api_gateway_logging" {
   name = "/aws/apigateway/${aws_api_gateway_rest_api.grisapi.id}"
   retention_in_days = null
 }
+
+# Retrieve account ID
+data "aws_caller_identity" "current" {}
