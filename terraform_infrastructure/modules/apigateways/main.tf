@@ -102,7 +102,7 @@ resource "aws_lambda_permission" "apigw_cloudauth_lambda" {
   principal = "apigateway.amazonaws.com"
 
   #source_arn = "${aws_api_gateway_rest_api.grisapi.execution_arn}/*/GET/${var.resource_name}"    #use variable to subsitute for the cloudapi(resource)
-  source_arn = "*"
+  source_arn = "arn:aws:execute-api:*:*:${aws_api_gateway_rest_api.grisapi.id}/*/*/*"
 }
 
 # assume role for api gateway
