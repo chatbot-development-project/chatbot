@@ -50,7 +50,7 @@ resource "aws_api_gateway_integration" "get_lambda_integration" {
   rest_api_id             = aws_api_gateway_rest_api.grisapi.id
   resource_id             = aws_api_gateway_resource.cloudapi.id
   http_method             = aws_api_gateway_method.get_method.http_method
-  integration_http_method = "GET"  # Change this according to your Lambda function requirements
+  integration_http_method = "POST"  # Change this according to your Lambda function requirements
   type                    = "AWS_PROXY"
   # uri                     = aws_lambda_function.cloud_auth.invoke_arn
   uri                   = var.get_invoke_arn
