@@ -27,7 +27,7 @@ resource "aws_api_gateway_method" "get_method" {
   rest_api_id   = "${aws_api_gateway_rest_api.grisapi.id}"
   resource_id   = "${aws_api_gateway_resource.cloudapi.id}"
   http_method   = "GET"
-  authorization = "NONE"
+  authorization = "AWS_IAM"
   request_parameters = {
     "method.request.querystring.hub.challenge" = false
     "method.request.querystring.hub.mode" = false
