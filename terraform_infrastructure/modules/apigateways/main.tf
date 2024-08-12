@@ -129,3 +129,19 @@ resource "aws_api_gateway_authorizer" "gateway_authorizer" {
   authorizer_uri         = var.get_invoke_arn # (aws_lambda_function.cloud_auth.invoke_arn) # This sets the URI of the Lambda function that will be used as the authorizer (cloud auth)
   authorizer_credentials = aws_iam_role.api_gateway_assume.arn # This specifies the IAM role ARN that API Gateway will assume to invoke the Lambda function.
 }
+
+# create the method responses for the post method
+resource "aws_api_gateway_method_response" "post_response_200" {
+  rest_api_id = aws_api_gateway_rest_api.grisapi.id
+  resource_id = aws_api_gateway_resource.cloudapi.id
+  http_method = aws_api_gateway_method.post_method.http_method
+  status_code = "200"
+}
+
+# create the integration response for the post method
+resource "aws_api_gateway_integration_response" "post_Integration_Response" {
+  rest_api_id = aws_api_gateway_rest_api.grisapi.id
+  resource_id = aws_api_gateway_resource.cloudapi.id
+  http_method = aws_api_gateway_method.post_method.http_method
+  status_code = aws_api_gateway_method_response.post_response_200.status_code
+}
