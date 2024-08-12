@@ -136,6 +136,10 @@ resource "aws_api_gateway_method_response" "post_response_200" {
   resource_id = aws_api_gateway_resource.cloudapi.id
   http_method = aws_api_gateway_method.post_method.http_method
   status_code = "200"
+
+  response_models = {
+    "application/json" = ""
+  }
 }
 
 # create the integration response for the post method
