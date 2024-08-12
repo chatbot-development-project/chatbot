@@ -138,7 +138,7 @@ resource "aws_api_gateway_method_response" "post_response_200" {
   status_code = "200"
 
   response_models = {
-    "application/json" = ""
+    "application/json" = "Empty"
   }
 }
 
