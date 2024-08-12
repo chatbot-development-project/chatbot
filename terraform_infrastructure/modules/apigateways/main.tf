@@ -148,4 +148,14 @@ resource "aws_api_gateway_integration_response" "post_Integration_Response" {
   resource_id = aws_api_gateway_resource.cloudapi.id
   http_method = aws_api_gateway_method.post_method.http_method
   status_code = aws_api_gateway_method_response.post_response_200.status_code
+
+  response_templates = {
+    "application/json" = <<EOF
+    {
+      "statusCode": $input.json('$.statusCode'),
+      "message": $input.json('$.message'),
+      "data": $input.json('$.data')
+      }
+    EOF
+  }
 }
