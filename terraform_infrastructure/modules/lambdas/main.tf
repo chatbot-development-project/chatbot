@@ -85,6 +85,13 @@ resource "aws_lambda_function" "whatsapp_output" {
   timeout = var.Ltimeout
   filename = data.archive_file.output_python_code.output_path 
   source_code_hash = filebase64sha256(data.archive_file.output_python_code.output_path)
+
+  environment {
+    variables = {
+      ACCESS_TOKEN = var.access_token_evn
+      PHONE_NUMBER_ID = var.phone_number_id_env
+    }
+  }
 }
 
 # cloud watch logging for whatsapp output lambda function

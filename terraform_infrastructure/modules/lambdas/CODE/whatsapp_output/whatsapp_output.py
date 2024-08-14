@@ -1,13 +1,19 @@
 import json
+import os
 import boto3
 import requests
 
 def lambda_handler(event, context):
     print(event)
     
-    access_token = "EAAUOBAO39R4BO5rCz5TZAeQyLkC1gLM2XLrsaKhce5rSpA7GN7dswu9iLzfbUKWZBdtx5AdKLNU3ojZB7I15bNE9ZAGcVZAglZCbZBZCIDCaXZBfi0yKPqk4LNN99iAZCCpH2mrXqUEAESrWWBmNSEOvz71q7FKybIMm5qx9CetnlVCIcxiyHmKb4dN5vljEIMsbRz"
-    
-    url = f'https://graph.facebook.com/v19.0/265131066689179/messages'
+    # access_token = "EAAUOBAO39R4BO5rCz5TZAeQyLkC1gLM2XLrsaKhce5rSpA7GN7dswu9iLzfbUKWZBdtx5AdKLNU3ojZB7I15bNE9ZAGcVZAglZCbZBZCIDCaXZBfi0yKPqk4LNN99iAZCCpH2mrXqUEAESrWWBmNSEOvz71q7FKybIMm5qx9CetnlVCIcxiyHmKb4dN5vljEIMsbRz"
+    access_token = os.getenv('ACCESS_TOKEN')
+
+    phone_number_id_env = os.getenv('PHONE_NUMBER_ID')
+
+    url = f'https://graph.facebook.com/v19.0/{phone_number_id_env}/messages'
+
+    # url = f'https://graph.facebook.com/v19.0/265131066689179/messages'
     
     headers = {'Authorization': f'Bearer {access_token}', 'Content-Type': 'application/json'}
     
