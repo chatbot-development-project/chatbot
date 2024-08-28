@@ -44,7 +44,7 @@ variable "process_stream" {
 }
 
 variable "Lruntime" {
-  default = "python3.9"
+  default = "python3.10"
 }
 
 variable "Ltimeout" {
