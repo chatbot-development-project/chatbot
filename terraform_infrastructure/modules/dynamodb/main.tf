@@ -35,7 +35,7 @@ resource "aws_lambda_event_source_mapping" "trg" {
   #function_name = aws_lambda_function.process_stream.arn
   function_name = var.process_stream_function_name
   starting_position = "LATEST"
-  batch_size        = 1000
+  batch_size        = 10000
 }
 
 ###############################
