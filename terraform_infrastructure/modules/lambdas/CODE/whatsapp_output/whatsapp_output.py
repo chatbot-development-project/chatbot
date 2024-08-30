@@ -19,7 +19,8 @@ def lambda_handler(event, context):
     
     whatsapp_number = event['whatsapp_number']
     message_id = event['message_id']
-    bedrock_output = event['body']['generations'][0]['text']
+    # bedrock_output = event['body']['generations'][0]['text']
+    bedrock_output = event['body']
 
     data = {
         "messaging_product": "whatsapp",
