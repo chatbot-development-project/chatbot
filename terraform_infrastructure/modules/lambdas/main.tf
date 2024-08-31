@@ -203,3 +203,26 @@ resource "aws_cloudwatch_log_group" "process_lambda_logging" {
   name = "/aws/lambda/${aws_lambda_function.process_stream.function_name}"
   retention_in_days = null
 }
+
+
+
+# Random string resource
+resource "random_string" "rando" {
+  length  = 6
+  special = false
+}
+
+# Create an S3 Bucket to store the langchain layer
+resource "aws_s3_bucket" "langchain_layer_bucket" {
+  bucket = "langchain-bucket-${random_string.rando.result}"
+  tags = {
+    Name = "Lambda Layer S3 Bucket"
+  }
+}
+
+# Upload the lambda_layer.zip to the S3 Bucket
+resource "aws_s3_object" "upload_layer" {
+  bucket = aws_s3_bucket.langchain_layer_bucket.bucket
+  key    = "langchain_layer.zip"
+  source = "${path.module}/langchain_layer.zip"  # Path to your local zip file
+}
