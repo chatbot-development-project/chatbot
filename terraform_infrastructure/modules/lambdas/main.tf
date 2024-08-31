@@ -173,39 +173,6 @@ data "archive_file" "process_stream_python_code" {
   output_path = "${path.module}/process_stream.zip"
 }
 
-# langchain layer for process stream
-#resource "aws_lambda_layer_version" "langchain_layer" {
-#  filename   = "${path.module}/langchain_layer.zip"
-#  layer_name = "langchain_layer"
-#  # compatible_runtimes = ["python3.8"]
-#}
-
-# process stream lambda function
-resource "aws_lambda_function" "process_stream" {
-  function_name =var.process_stream
-  role = aws_iam_role.process_assume.arn
-  handler = "process_stream.lambda_handler"
-  layers  = [aws_lambda_layer_version.langchain_layer.arn]
-  runtime = var.Lruntime
-  timeout = var.Ltimeout
-  filename = data.archive_file.process_stream_python_code.output_path 
-  source_code_hash = filebase64sha256(data.archive_file.process_stream_python_code.output_path)
-
-  environment {
-    variables = {
-      KNOWLEDGE_BASE_ID = var.knowledege_base_evn
-    }
-  }
-}
-
-# cloud watch logging for process stream lambda function
-resource "aws_cloudwatch_log_group" "process_lambda_logging" {
-  name = "/aws/lambda/${aws_lambda_function.process_stream.function_name}"
-  retention_in_days = null
-}
-
-
-
 # Random string resource
 resource "random_string" "rando" {
   length  = 6
@@ -234,3 +201,30 @@ resource "aws_lambda_layer_version" "langchain_layer" {
   s3_bucket   = aws_s3_bucket.langchain_layer_bucket.bucket
   s3_key      = aws_s3_object.upload_layer.key
 }
+
+# process stream lambda function
+resource "aws_lambda_function" "process_stream" {
+  function_name =var.process_stream
+  role = aws_iam_role.process_assume.arn
+  handler = "process_stream.lambda_handler"
+  layers  = [aws_lambda_layer_version.langchain_layer.arn]
+  runtime = var.Lruntime
+  timeout = var.Ltimeout
+  filename = data.archive_file.process_stream_python_code.output_path 
+  source_code_hash = filebase64sha256(data.archive_file.process_stream_python_code.output_path)
+
+  environment {
+    variables = {
+      KNOWLEDGE_BASE_ID = var.knowledege_base_evn
+    }
+  }
+}
+
+# cloud watch logging for process stream lambda function
+resource "aws_cloudwatch_log_group" "process_lambda_logging" {
+  name = "/aws/lambda/${aws_lambda_function.process_stream.function_name}"
+  retention_in_days = null
+}
+
+
+
