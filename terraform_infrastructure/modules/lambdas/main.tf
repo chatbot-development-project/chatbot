@@ -174,11 +174,11 @@ data "archive_file" "process_stream_python_code" {
 }
 
 # langchain layer for process stream
-resource "aws_lambda_layer_version" "langchain_layer" {
-  filename   = "${path.module}/langchain_layer.zip"
-  layer_name = "langchain_layer"
-  # compatible_runtimes = ["python3.8"]
-}
+#resource "aws_lambda_layer_version" "langchain_layer" {
+#  filename   = "${path.module}/langchain_layer.zip"
+#  layer_name = "langchain_layer"
+#  # compatible_runtimes = ["python3.8"]
+#}
 
 # process stream lambda function
 resource "aws_lambda_function" "process_stream" {
@@ -226,4 +226,11 @@ resource "aws_s3_object" "upload_layer" {
   bucket = aws_s3_bucket.langchain_layer_bucket.bucket
   key    = "langchain_layer.zip"
   source = "${path.module}/langchain_layer.zip"  # Path to your local zip file
+}
+
+# Create a Lambda Layer from the s3 bucket
+resource "aws_lambda_layer_version" "langchain_layer" {
+  layer_name  = "langchain_layer"
+  s3_bucket   = aws_s3_bucket.langchain_layer_bucket.bucket
+  s3_key      = aws_s3_object.upload_layer.key
 }
