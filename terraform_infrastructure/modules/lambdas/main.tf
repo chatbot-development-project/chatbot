@@ -210,6 +210,7 @@ resource "aws_cloudwatch_log_group" "process_lambda_logging" {
 resource "random_string" "rando" {
   length  = 6
   special = false
+  upper   = false
 }
 
 # Create an S3 Bucket to store the langchain layer
