@@ -62,7 +62,7 @@ variable "access_token_evn" {
 }
 
 variable "phone_number_id_env" {
-  default = "392238747306869"
+  default = "425479003978705"
   description = "the evn var of the Phone number ID for WhatsApp output handler"
   type        = string
 }
