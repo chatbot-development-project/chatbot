@@ -3,7 +3,7 @@ data "aws_caller_identity" "current" {}
 
 # create a s3 bucket to upload file for the knowledgebase
 resource "aws_s3_bucket" "chatbot_bucket" {
-  bucket = "${var.bucket_name}${random_string.rand.result}"
+  bucket = "${var.bucket_name}-${random_string.rand.result}"
   
   tags = {
     Name        = "chatbot-development-project-bedrock-knowledgebase"
