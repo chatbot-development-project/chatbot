@@ -73,12 +73,9 @@ resource "awscc_bedrock_data_source" "data_source" {
   data_source_configuration = {
     s3_configuration = {
       bucket_arn         = aws_s3_bucket.chatbot_bucket.arn
-      inclusion_prefixes = ["source"]
     }
     type = "S3"
   }
-
-  data_deletion_policy = "RETAIN"
 }
 
 # Define the IAM Role with the specified trust policy
