@@ -15,6 +15,7 @@ resource "aws_s3_bucket" "chatbot_bucket" {
 resource "random_string" "rand" {
   length  = 6
   special = false
+  upper   = false
 }
 
 # create aws secret to store the pine cone api key that will be passed to the knowledege base as a ref to the pine cone db
