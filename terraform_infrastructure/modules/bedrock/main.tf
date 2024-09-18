@@ -3,7 +3,7 @@ data "aws_caller_identity" "current" {}
 
 # create a s3 bucket to upload file for the knowledgebase
 resource "aws_s3_bucket" "chatbot_bucket" {
-  bucket = var.bucket_name
+  bucket = "${var.bucket_name}-${random_string.rand.result}"
   
   tags = {
     Name        = "chatbot-development-project-bedrock-knowledgebase"
@@ -73,12 +73,12 @@ resource "awscc_bedrock_data_source" "data_source" {
   data_source_configuration = {
     s3_configuration = {
       bucket_arn         = aws_s3_bucket.chatbot_bucket.arn
-      inclusion_prefixes = ["source"]
+      # inclusion_prefixes = ["source"]
     }
     type = "S3"
   }
 
-  data_deletion_policy = "RETAIN"
+  data_deletion_policy = "DELETE"
 }
 
 # Define the IAM Role with the specified trust policy
