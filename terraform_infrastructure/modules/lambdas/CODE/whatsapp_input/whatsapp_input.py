@@ -24,7 +24,6 @@ def create_message(request_id, date_time, whatsapp_number, whatsapp_message):
 def lambda_handler(event, context):
     print(event)
     print(context)
-    response = {}
     
     request_id = context.aws_request_id
     whatsapp_message = event['entry'][0]['changes'][0]['value']['messages'][0]['text']['body']
@@ -34,6 +33,8 @@ def lambda_handler(event, context):
     date_time = datetime.utcfromtimestamp(timestamp)
     
     create_message(request_id, date_time, whatsapp_number, whatsapp_message)
-    response['statusCode'] = 200
-    
-    return response
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Success: Lambda executed successfully!')
+    }
