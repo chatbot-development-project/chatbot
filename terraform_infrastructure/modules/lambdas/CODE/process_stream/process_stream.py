@@ -1,6 +1,7 @@
 import json
 import boto3
 import time
+import io
 import os
 from boto3.dynamodb.conditions import Key
 
@@ -8,6 +9,7 @@ from boto3.dynamodb.conditions import Key
 lambda_client = boto3.client('lambda')
 ddb = boto3.resource('dynamodb')
 bedrock_client = boto3.client('bedrock-runtime', region_name='us-east-1')
+s3 = boto3.client('s3')
 
 # DynamoDB tables
 user_metadata = ddb.Table('user_metadata')
@@ -34,18 +36,79 @@ def query_history(table, key, keyValue):
     response = table.query(KeyConditionExpression=Key(key).eq(keyValue))
     print('History has been queried')
     print(response)
-    return response['Items'][0]
-    #return response['Items'][0] if response['Items'] else None
-  
+    if 'Items' in response and response['Items']:
+        return response['Items'][0]
+    else:
+        print("No items found in the query response")
+        response['Items'] = [{'content': [{'text': 'Hello Claude'}], 'role': 'user'}]
+        return response['Items'][0]
+
+# write a function "knowledge_base" to call s3, get all objects in a bucket and put them in a list
+# then return the list
+def knowledge_base(bucket_name):
+    object_list = []
+    response = s3.list_objects_v2(Bucket=bucket_name)
+    print('Starting to list docs')
+    
+    # Check if there are contents in the response
+    if 'Contents' in response:
+        # Add object keys to the list
+        for obj in response['Contents']:
+            object_list.append(obj['Key'])
+            print(object_list)
+            print('objects listed')
+    
+    return object_list
+
+# Read files from the objects in the list
+def read_files():
+    file_contents = []
+    bucket_name = 'chatbot-development-testbucket-00001'
+    object_list = knowledge_base(bucket_name)
+    for object_key in object_list:
+        print(f"Reading file: {object_key}")
+        try:
+            # Get the object from S3
+            response = s3.get_object(Bucket=bucket_name, Key=object_key)
+            file_content = response['Body'].read()
+            file_contents.append((object_key, file_content))
+            print(f"Successfully read: {object_key}")           
+            
+        except Exception as e:
+            print(f"Error reading {object_key}: {str(e)}")
+    print(file_contents)
+    return file_contents
+
 
 def generate_response(prompt, history):
-    system_prompt = [{"text": "You are a helpful assistant. Always reply in english language."}]
+    system_prompt = [{"text": "You are a helpful assistant. \
+                      Give concise summaries only. \
+                      Always reply in english language."}]
     print('Load the system prompt')
-    
+
+    documents = read_files()
+    print(documents)
+    print('Loaded the knowledge base')
+
     # Prepare conversation history for Bedrock Converse API
     print('Print out the history')
     print(history)
-    conversation = history + [{"role": "user", "content": [{"text": prompt}]}]
+    #conversation = history + [{"role": "user", "content": [{"text": prompt}]}]
+    conversation = history + [{
+        "role": "user",
+        "content": [{"text": prompt}] + [
+            {
+                "document": {
+                    "name": f"Document_{i}",
+                    "format": "txt",
+                    "source": {
+                        "bytes": doc[1]
+                    }
+                }
+            } for i, doc in enumerate(documents)
+        ]
+    }]
+
     print(conversation)
     print('Prepare conversation history')
 
