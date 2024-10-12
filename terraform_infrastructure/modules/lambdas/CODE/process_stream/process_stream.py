@@ -8,7 +8,6 @@ from boto3.dynamodb.conditions import Key
 # AWS service clients
 lambda_client = boto3.client('lambda')
 ddb = boto3.resource('dynamodb')
-bedrock_client = boto3.client('bedrock-runtime', region_name='us-east-1')
 s3 = boto3.client('s3')
 
 # DynamoDB tables
@@ -17,7 +16,6 @@ user_session_record = ddb.Table('user_session_record')
 session_table = ddb.Table('session_table')
 
 # Bedrock model configuration
-bedrock_model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
 
 # Utilites
 def add_message_to_history(role, content, history):
@@ -43,73 +41,26 @@ def query_history(table, key, keyValue):
         response['Items'] = [{'content': [{'text': 'Hello Claude'}], 'role': 'user'}]
         return response['Items'][0]
 
-
-# Read files from the objects in the list
-def read_knowledge_base_file():
-    bucket_name = 'chatbot-development-testbucket-00001'
-    file_key = 'business_info.md'
     try:
-        response = s3.get_object(Bucket=bucket_name, Key=file_key)
-        file_content = response['Body'].read()
-        return file_content
-    
-    except Exception as e:
-        print(f"Error reading: {str(e)}")
-        return
-
-
-def generate_response(prompt, history):
-    system_prompt = [{"text": """You are a highly intelligent and efficient assistant. 
-                      Your goal is to provide helpful, accurate, and clear information in a concise manner.
-                      Guidelines:
-                      - Keep responses short, ideally no more than 2-3 sentences.
-                      - Use simple and direct language to ensure easy understanding.
-                      - Prioritize giving actionable advice or clear information.
-                      - Avoid unnecessary details or complex explanations unless specifically requested by the user.
-                      - Anticipate the user's needs and provide relevant follow-up suggestions when appropriate.
-                      - If a question requires more context, prompt the user for clarification before answering.
-                      - Always respond in English unless asked otherwise.
-                      Your priority is to make sure users feel helped and satisfied with as little text as possible"""}]
-    print('Load the system prompt')
-
-    documents = read_knowledge_base_file()
-    print(documents)
-    print('Loaded the knowledge base')
-
-    # Prepare conversation history for Bedrock Converse API
-    print('Print out the history')
-    print(history)
-    conversation = history + [{
-        "role": "user",
-        "content": [{"text": prompt}] + [
-            {
-                "document": {
-                    "name": "Document_1",
-                    "format": "txt",
-                    "source": {
-                        "bytes": documents
-                    }
+        response = bedrock_client.retrieve_and_generate(
+            input={
+                "text": input_text
+            },
+            retrieveAndGenerateConfiguration={
+                "type": "KNOWLEDGE_BASE",
+                "knowledgeBaseConfiguration": {
+                    "knowledgeBaseId": knowledge_base_id,
+                    "modelArn": bedrock_model_arn
                 }
             }
-        ]
-    }]
-
-    print(conversation)
-    print('Prepare conversation history')
-
-    # Send message to Bedrock Converse API
-    response = bedrock_client.converse(
-        modelId=bedrock_model_id,
-        messages=conversation,
-        system=system_prompt,
-        inferenceConfig={"maxTokens": 512, "temperature": 0.5, "topP": 0.9}
-    )
-    print('Get the response')
-    
-    # Extract response from Bedrock
-    response_text = response["output"]["message"]["content"][0]["text"]
-    return response_text
-
+        )
+        
+        print("Got the conversation record")
+        generated_text = response['output']['text']
+        return generated_text
+    except Exception as e:
+        print(f"Error in retrieve_and_generate: {str(e)}")
+        return "I'm sorry, I encountered an error while processing your request."
 
 def lambda_handler(event, context):
     print(event)
@@ -175,4 +126,4 @@ def lambda_handler(event, context):
         
     except Exception as e:
         print('FAILED!', e)
-        return {"body": "I don't know"}
+
