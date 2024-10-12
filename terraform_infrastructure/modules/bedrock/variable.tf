@@ -1,7 +1,7 @@
 variable "bucket_name" {
   description = "The name of the S3 bucket"
   type        = string
-  default     = "chatbot-development-project-bedrock-knowledgebase1234"
+  default     = "chatbot-development-project-bedrock-knowledgebase"
 }
 
 variable "secret_name" {
