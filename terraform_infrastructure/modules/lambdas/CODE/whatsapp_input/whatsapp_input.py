@@ -41,7 +41,6 @@ def lambda_handler(event, context):
     
     # Call the function to create a message in the DynamoDB table
     create_message(request_id, date_time, whatsapp_number, whatsapp_message)
-  
 
     # Return success response
     return {
