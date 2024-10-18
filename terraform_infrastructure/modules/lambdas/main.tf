@@ -68,7 +68,7 @@ data "archive_file" "output_python_code" {
   output_path = "${path.module}/whatsapp_output.zip"
 }
 
-# lambda layer for whatsapp output
+# lambda layer for whatsapp output and delay_message
 resource "aws_lambda_layer_version" "my_layer" {
   filename   = "${path.module}/python.zip"
   layer_name = "Requests"
@@ -228,3 +228,55 @@ resource "aws_cloudwatch_log_group" "process_lambda_logging" {
 
 
 
+
+
+#############################
+### delay_message   #########
+#############################
+
+# assume role for delay_message
+resource "aws_iam_role" "delay_assume" {
+  name = var.delay_message_role
+  assume_role_policy = file("${path.module}/policy/assume_role.json") 
+}
+
+# iam policy for delay_message
+resource "aws_iam_role_policy" "delay_policy" {
+  name = var.lambda_iam_policy_name
+  policy = file("${path.module}/policy/delay_policy.json")
+  role = aws_iam_role.delay_assume.id
+}
+
+# archive src folder for delay_message
+data "archive_file" "delay_message_python_code" {
+  type = "zip"
+  source_dir = "${path.module}/CODE/delay_message/"
+  output_path = "${path.module}/delay_message.zip"
+}
+
+# NOTE the request layer resource created in the whatsapp output section would also be used for the delay_message function
+
+# whatsapp output lambda function
+resource "aws_lambda_function" "delay_message" {
+  function_name =var.delay_message
+  role = aws_iam_role.delay_assume.arn
+  handler = "delay_message.lambda_handler"
+  layers  = [aws_lambda_layer_version.my_layer.arn] # request layer would be ref here 
+  runtime = var.Lruntime
+  timeout = var.Ltimeout
+  filename = data.archive_file.delay_message_python_code.output_path 
+  source_code_hash = filebase64sha256(data.archive_file.delay_message_python_code.output_path)
+
+  environment {
+    variables = {
+      ACCESS_TOKEN = var.access_token_evn
+      PHONE_NUMBER_ID = var.phone_number_id_env
+    }
+  }
+}
+
+# cloud watch logging for delay_message lambda function
+resource "aws_cloudwatch_log_group" "delay_lambda_logging" {
+  name = "/aws/lambda/${aws_lambda_function.delay_message.function_name}"
+  retention_in_days = null
+}
