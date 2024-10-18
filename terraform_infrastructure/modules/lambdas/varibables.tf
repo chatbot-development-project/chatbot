@@ -14,6 +14,9 @@ variable "process_stream_role" {
   default = "process_iam_role"
 }
 
+variable "delay_message_role" {
+  default = "delay_iam_role"
+}
 
 variable "lambda_iam_policy_name" {
   default = "lambda_iam_policy"
@@ -34,6 +37,12 @@ variable "whatsapp_output" {
 variable "cloud_auth" {
   default = "cloud_auth"
   description = "lambda function for cloud auth"
+  type        = string
+}
+
+variable "delay_message" {
+  default = "delay_message"
+  description = "lambda function for delay_message"
   type        = string
 }
 
