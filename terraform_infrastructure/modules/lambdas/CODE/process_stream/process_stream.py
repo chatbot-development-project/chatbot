@@ -8,6 +8,7 @@ from boto3.dynamodb.conditions import Key
 # AWS service clients
 lambda_client = boto3.client('lambda')
 ddb = boto3.resource('dynamodb')
+bedrock_client = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
 s3 = boto3.client('s3')
 
 # DynamoDB tables
@@ -16,6 +17,8 @@ user_session_record = ddb.Table('user_session_record')
 session_table = ddb.Table('session_table')
 
 # Bedrock model configuration
+bedrock_model_arn = "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0"
+knowledge_base_id = "NW1XPHSZL8"
 
 # Utilites
 def add_message_to_history(role, content, history):
@@ -41,6 +44,37 @@ def query_history(table, key, keyValue):
         response['Items'] = [{'content': [{'text': 'Hello Claude'}], 'role': 'user'}]
         return response['Items'][0]
 
+def format_history(history):
+    last_3_entries = history[-1:]
+    formatted = ""
+    for entry in last_3_entries:
+        role = entry['role']
+        content = entry['content'][0]['text']
+        formatted += f"{role}: {content}\n"
+        print(formatted)
+    return formatted
+
+def generate_response(prompt, history):
+    print("starting the conversation")
+
+    modified_prompt = f"""
+    Role:
+    You are a highly intelligent and efficient assistant. 
+    Guidelines:
+    - Keep responses short, ideally no more than 2-3 sentences.
+    - Use simple and direct language to ensure easy understanding.
+    - Avoid unnecessary details or complex explanations unless specifically requested by the user.
+    - If a question requires more context, prompt the user for clarification before answering.
+    - Always respond in English unless asked otherwise.    
+    Your priority is to make sure the user feel helped and satisfied with as little text as possible.
+    Question:
+    {prompt}
+    """
+
+
+    formatted_history = format_history(history)
+    input_text = f"{formatted_history}User: {modified_prompt}"    
+
     try:
         response = bedrock_client.retrieve_and_generate(
             input={
@@ -61,6 +95,7 @@ def query_history(table, key, keyValue):
     except Exception as e:
         print(f"Error in retrieve_and_generate: {str(e)}")
         return "I'm sorry, I encountered an error while processing your request."
+
 
 def lambda_handler(event, context):
     print(event)
@@ -126,4 +161,4 @@ def lambda_handler(event, context):
         
     except Exception as e:
         print('FAILED!', e)
-
+        return {"body": "I don't know"}
