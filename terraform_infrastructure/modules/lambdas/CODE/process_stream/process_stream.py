@@ -112,6 +112,19 @@ def lambda_handler(event, context):
         print('Get session data')
         
         if time_difference > 300:
+
+            lambda_client.invoke(
+                FunctionName='delay_message',
+                InvocationType='Event',
+                Payload=json.dumps({
+                    'message_id': message_id,
+                    'whatsapp_number': whatsapp_number,
+                    'whatsapp_message': whatsapp_message,
+                    'body': 'none'
+                })
+            )
+            print('Invoke delay')
+
             user_session_record.update_item(
                 Key={'phone_number': whatsapp_number},
                 UpdateExpression="set session_time=:t",
@@ -126,6 +139,19 @@ def lambda_handler(event, context):
             print('Get session record')
     
     except KeyError:
+        
+        lambda_client.invoke(
+            FunctionName='delay_message',
+            InvocationType='Event',
+            Payload=json.dumps({
+                'message_id': message_id,
+                'whatsapp_number': whatsapp_number,
+                'whatsapp_message': whatsapp_message,
+                'body': 'none'
+            })
+        )
+        print('Invoke delay')        
+        
         current_time = int(time.time())
         user_session_record.put_item(Item={"phone_number": whatsapp_number, "session_time": current_time})
         ss_id = f"{whatsapp_number}_{current_time}"
