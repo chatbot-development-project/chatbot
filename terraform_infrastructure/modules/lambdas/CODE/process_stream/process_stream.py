@@ -18,7 +18,7 @@ session_table = ddb.Table('session_table')
 
 # Bedrock model configuration
 bedrock_model_arn = "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0"
-knowledge_base_id = "NW1XPHSZL8"
+knowledge_base_id = os.getenv('KNOWLEDGE_BASE_ID')
 
 # Utilites
 def add_message_to_history(role, content, history):
