@@ -66,12 +66,12 @@ variable "knowledege_base_evn" {
 
 # Create a variable for access token and phone number id in the variable.tf file
 variable "access_token_evn" {
-  default = "EAAUOBAO39R4BO5rCz5TZAeQyLkC1gLM2XLrsaKhce5rSpA7GN7dswu9iLzfbUKWZBdtx5AdKLNU3ojZB7I15bNE9ZAGcVZAglZCbZBZCIDCaXZBfi0yKPqk4LNN99iAZCCpH2mrXqUEAESrWWBmNSEOvz71q7FKybIMm5qx9CetnlVCIcxiyHmKb4dN5vljEIMsbRz"
+  default = "ADD_ACCESS_TOKEN_HERE_XXXXX"
   description = "this is the evn of the access token that would be passed to the whatsapp output handler"
 }
 
 variable "phone_number_id_env" {
-  default = "425479003978705"
+  default = "ADD-PHONE-NUMBER-ID-HERE-XXXX"
   description = "the evn var of the Phone number ID for WhatsApp output handler"
   type        = string
 }
