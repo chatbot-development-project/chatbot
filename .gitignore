@@ -3,3 +3,7 @@
 samconfig.toml
 target
 venv
+terraform.tfstate
+.terraform
+main.tf.save
+.terraform.lock.hcl
